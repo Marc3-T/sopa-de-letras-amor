@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sopa de Letras de Amor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #ffebee;
+            margin: 0;
+            padding: 20px;
+            touch-action: manipulation;
+        }
+        h1 {
+            color: #d81b60;
+        }
+        .game-container {
+            margin: 0 auto;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        #word-search {
+            border-collapse: collapse;
+            margin: 20px auto;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        #word-search td {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 18px;
+            cursor: pointer;
+            user-select: none;
+        }
+        #word-search td.selected {
+            background-color: #f8bbd0;
+        }
+        #word-search td.found {
+            background-color: #f48fb1;
+            color: white;
+        }
+        .word-list {
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #fce4ec;
+            border-radius: 10px;
+            max-width: 300px;
+        }
+        .word-list div {
+            margin: 5px;
+            padding: 5px;
+            font-size: 16px;
+        }
+        .word-list div.found {
+            text-decoration: line-through;
+            color: #d81b60;
+        }
+        #message {
+            color: #d81b60;
+            font-weight: bold;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>❤️ Sopa de Letras de Amor ❤️</h1>
+    <div id="message">Encuentra las palabras de amor...</div>
+    <div class="game-container">
+        <table id="word-search"></table>
+    </div>
+    <div class="word-list" id="word-list"></div>
+
+    <script>
+        // Palabras a buscar
+        const words = ["TEAMO", "AMOR", "LOHA", "MARCE"];
+        const gridSize = 10; // Tamaño de la grilla (10x10)
+        let grid = [];
+        let selectedCells = [];
+        let foundWords = [];
+
+        // Inicializar la grilla
+        function initGrid() {
+            const table = document.getElementById('word-search');
+            table.innerHTML = '';
+            grid = Array(gridSize).fill().map(() => Array(gridSize).fill(''));
+
+            // Llenar la grilla con letras aleatorias (A-Z)
+            for (let i = 0; i < gridSize; i++) {
+                const row = table.insertRow();
+                for (let j = 0; j < gridSize; j++) {
+                    const cell = row.insertCell();
+                    cell.textContent = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    cell.addEventListener('touchstart', handleCellTouch);
+                    grid[i][j] = cell.textContent;
+                }
+            }
+
+            // Colocar palabras en la grilla
+            placeWords();
+            updateWordList();
+        }
+
+        // Colocar palabras en direcciones aleatorias
+        function placeWords() {
+            const directions = [
+                { dr: 0, dc: 1 },  // Horizontal
+                { dr: 1, dc: 0 },  // Vertical
+                { dr: 1, dc: 1 },  // Diagonal
+            ];
+
+            words.forEach(word => {
+                let placed = false;
+                while (!placed) {
+                    const dir = directions[Math.floor(Math.random() * directions.length)];
+                    const row = Math.floor(Math.random() * (gridSize - word.length * dir.dr));
+                    const col = Math.floor(Math.random() * (gridSize - word.length * dir.dc));
+
+                    let canPlace = true;
+                    for (let i = 0; i < word.length; i++) {
+                        const r = row + i * dir.dr;
+                        const c = col + i * dir.dc;
+                        if (grid[r][c] !== '' && grid[r][c] !== word[i]) {
+                            canPlace = false;
+                            break;
+                        }
+                    }
+
+                    if (canPlace) {
+                        for (let i = 0; i < word.length; i++) {
+                            const r = row + i * dir.dr;
+                            const c = col + i * dir.dc;
+                            grid[r][c] = word[i];
+                            const cell = document.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+                            cell.textContent = word[i];
+                        }
+                        placed = true;
+                    }
+                }
+            });
+        }
+
+        // Manejar selección táctil
+        function handleCellTouch(e) {
+            const cell = e.target;
+            const row = parseInt(cell.dataset.row);
+            const col = parseInt(cell.dataset.col);
+
+            // Limpiar selección si es la primera celda
+            if (selectedCells.length === 0 || 
+                (Math.abs(row - selectedCells[0].row) <= 1 && 
+                 Math.abs(col - selectedCells[0].col) <= 1)) {
+                cell.classList.add('selected');
+                selectedCells.push({ row, col, cell });
+            }
+
+            // Verificar si se encontró una palabra
+            if (selectedCells.length > 1) {
+                checkForWord();
+            }
+        }
+
+        // Verificar si las celdas seleccionadas forman una palabra
+        function checkForWord() {
+            const selectedWord = selectedCells.map(c => c.cell.textContent).join('');
+            const reversedWord = [...selectedWord].reverse().join('');
+
+            if (words.includes(selectedWord) && !foundWords.includes(selectedWord)) {
+                foundWords.push(selectedWord);
+                selectedCells.forEach(c => c.cell.classList.add('found'));
+                updateWordList();
+            } else if (words.includes(reversedWord) && !foundWords.includes(reversedWord)) {
+                foundWords.push(reversedWord);
+                selectedCells.forEach(c => c.cell.classList.add('found'));
+                updateWordList();
+            }
+
+            // Limpiar selección
+            selectedCells.forEach(c => c.cell.classList.remove('selected'));
+            selectedCells = [];
+        }
+
+        // Actualizar la lista de palabras encontradas
+        function updateWordList() {
+            const wordList = document.getElementById('word-list');
+            wordList.innerHTML = '';
+            words.forEach(word => {
+                const wordElement = document.createElement('div');
+                wordElement.textContent = word;
+                if (foundWords.includes(word)) {
+                    wordElement.classList.add('found');
+                }
+                wordList.appendChild(wordElement);
+            });
+
+            if (foundWords.length === words.length) {
+                document.getElementById('message').textContent = '¡Encontraste todas las palabras! ❤️';
+            }
+        }
+
+        // Iniciar el juego al cargar la página
+        window.onload = initGrid;
+    </script>
+</body>
+</html>
