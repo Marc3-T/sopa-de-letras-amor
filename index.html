@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sopa de Letras de Amor</title>
+    <title>Sopa de Letras para Loha ❤️</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -74,8 +74,8 @@
     </style>
 </head>
 <body>
-    <h1>❤️ Sopa de Letras de Amor ❤️</h1>
-    <p>Encuentra las palabras táctilandolas en la cuadrícula:</p>
+    <h1>❤️ Sopa de Letras ❤️</h1>
+    <p></p>
     
     <div id="game-container">
         <table id="word-search"></table>
@@ -85,21 +85,21 @@
     <div id="message"></div>
 
     <script>
-        // Palabras a buscar
-        const words = ["TEAMO", "AMOR", "LOHA", "MARCE", "BESO", "ABRAZO", "CORAZON", "PAREJA"];
         
-        // Tamaño de la sopa de letras (15x15)
+        const words = ["TEAMO", "AMOR", "LOHA", "MARCE", "BESO", "HERMOSA", "CORAZON", "PERFECTA"];
+        
+        
         const gridSize = 15;
         let grid = [];
         let selectedCells = [];
         let foundWords = [];
         
-        // Inicializar la cuadrícula vacía
+        
         function initGrid() {
             grid = Array(gridSize).fill().map(() => Array(gridSize).fill(''));
         }
         
-        // Colocar palabras en la cuadrícula
+        
         function placeWords() {
             const directions = [
                 { dr: 1, dc: 0 },  // Horizontal
@@ -139,7 +139,7 @@
             });
         }
         
-        // Rellenar espacios vacíos con letras aleatorias
+        
         function fillEmptySpaces() {
             const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             for (let r = 0; r < gridSize; r++) {
@@ -151,7 +151,7 @@
             }
         }
         
-        // Renderizar la cuadrícula en el HTML
+        
         function renderGrid() {
             const table = document.getElementById('word-search');
             table.innerHTML = '';
@@ -180,7 +180,7 @@
             }
         }
         
-        // Renderizar la lista de palabras
+        
         function renderWordList() {
             const wordListDiv = document.getElementById('word-list');
             wordListDiv.innerHTML = '';
@@ -196,7 +196,7 @@
             });
         }
         
-        // Manejar selección de celdas
+        
         let isSelecting = false;
         
         function handleTouchStart(e) {
@@ -219,14 +219,14 @@
                 const row = parseInt(element.dataset.row);
                 const col = parseInt(element.dataset.col);
                 
-                // Solo permitir selección en línea recta
+                
                 const firstCell = selectedCells[0];
                 const sameRow = row === firstCell.row;
                 const sameCol = col === firstCell.col;
                 const isDiagonal = Math.abs(row - firstCell.row) === Math.abs(col - firstCell.col);
                 
                 if (selectedCells.length === 1 || sameRow || sameCol || isDiagonal) {
-                    // Limpiar selección previa
+                    
                     document.querySelectorAll('#word-search td.selected').forEach(td => {
                         if (!selectedCells.some(cell => 
                             cell.row === parseInt(td.dataset.row) && 
@@ -236,7 +236,7 @@
                         }
                     });
                     
-                    // Agregar nueva celda si no está ya seleccionada
+                    
                     if (!selectedCells.some(cell => cell.row === row && cell.col === col)) {
                         selectedCells.push({ row, col });
                         element.classList.add('selected');
@@ -250,7 +250,7 @@
             isSelecting = false;
         }
         
-        // Versiones para ratón (compatibilidad)
+        
         function handleMouseDown(e) {
             const td = e.target;
             if (!td.classList.contains('found')) {
@@ -296,23 +296,23 @@
             isSelecting = false;
         }
         
-        // Verificar si la selección es una palabra válida
+        
         function checkSelection() {
             if (selectedCells.length < 2) {
                 clearSelection();
                 return;
             }
             
-            // Obtener las letras seleccionadas
+            
             const selectedWord = selectedCells.map(cell => 
                 grid[cell.row][cell.col]
             ).join('');
             
-            // Verificar si es una palabra buscada
+            
             if (words.includes(selectedWord) && !foundWords.includes(selectedWord)) {
                 foundWords.push(selectedWord);
                 
-                // Marcar celdas como encontradas
+                
                 selectedCells.forEach(cell => {
                     const td = document.querySelector(
                         `td[data-row="${cell.row}"][data-col="${cell.col}"]`
@@ -321,19 +321,19 @@
                     td.classList.add('found');
                 });
                 
-                // Actualizar lista de palabras
+                
                 renderWordList();
                 
-                // Mostrar mensaje
+                
                 document.getElementById('message').textContent = `¡Encontraste "${selectedWord}"!`;
                 setTimeout(() => {
                     document.getElementById('message').textContent = '';
                 }, 2000);
                 
-                // Verificar si ganó
+                
                 if (foundWords.length === words.length) {
                     setTimeout(() => {
-                        document.getElementById('message').textContent = '¡Felicidades, ganaste! ❤️';
+                        document.getElementById('message').textContent = 'Sabía que lo lograrías mi amor, eres la mejor ❤️';
                     }, 500);
                 }
             } else {
@@ -353,7 +353,7 @@
             selectedCells = [];
         }
         
-        // Inicializar el juego
+        
         function initGame() {
             initGrid();
             placeWords();
@@ -362,7 +362,7 @@
             renderWordList();
         }
         
-        // Iniciar cuando se carga la página
+        
         window.addEventListener('load', initGame);
     </script>
 </body>
